@@ -15,3 +15,8 @@ que se almacenan en una base de datos.
 | DELETE | `/coders/{id}` | |
 
 ![](docs/image.png)
+
+## TODO
+
+- Completar datos en `data.sql` (Javi)
+- Completar los métodos de la API con los test (Gabi)
