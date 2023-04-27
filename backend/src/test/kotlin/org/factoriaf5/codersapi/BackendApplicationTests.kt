@@ -32,7 +32,7 @@ class BackendApplicationTests {
     @Test
     fun getCoders() {
         //given
-        val coder = Coder(name = "Pepe")
+        val coder = Coder(name = "Pepe", favoriteLanguage ="PHP", imageUrl ="example.jpg")
         repository.save(coder)
 
         // when
