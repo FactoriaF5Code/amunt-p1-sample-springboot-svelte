@@ -8,7 +8,6 @@ import {coders} from "../store/store.js";
 
     {#each $coders as coder}
         <div>{coder.name} + {coder.favoriteLanguage} + {coder.imageUrl}</div>
-
     {/each}
 
 

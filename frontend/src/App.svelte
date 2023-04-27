@@ -2,6 +2,7 @@
     import {onMount} from "svelte";
     import CoderList from "./components/CoderList.svelte";
     import {coders} from "./store/store.js";
+    import NewCoderDialog from "./components/NewCoderDialog.svelte";
 
     onMount(async () => {
         //const response = await fetch('http://localhost:9000/api/coders')
@@ -12,16 +13,25 @@
             .then(data => coders.set(data))
     })
 
-    coders.subscribe(value => {console.log(value)})
+    let showCreateDialog = false;
+
+    const toggleShowCreateDialog = () => {
+        showCreateDialog = !showCreateDialog
+    }
 
 </script>
 
 <main>
     <nav class="top-bar">
         <div class="top-bar-div">Coder App</div>
+        <button on:click={toggleShowCreateDialog}>Add</button>
     </nav>
+    {#if showCreateDialog}
+        <NewCoderDialog/>
+    {/if}
 
-    <CoderList />
+
+    <CoderList/>
 
 </main>
 
