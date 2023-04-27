@@ -1,7 +1,9 @@
 package org.factoriaf5.codersapi
 
+import org.factoriaf5.codersapi.repositories.Coder
+import org.factoriaf5.codersapi.repositories.CoderRepository
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,11 +20,27 @@ class BackendApplicationTests {
     @Autowired //injecta una dependecia
     lateinit var restTemplate: TestRestTemplate
 
+
+    @Autowired
+    lateinit var repository : CoderRepository
+
+    @BeforeEach //ejecuta antes de cada test
+    fun setUp() {
+        repository.deleteAll()
+    }
+
     @Test
     fun getCoders() {
-        val result = restTemplate.getForEntity("/api/coders", Coder::class.java);
+        //given
+        val coder = Coder(name = "Pepe")
+        repository.save(coder)
 
-        assertNotNull(result)
-        assertEquals(OK, result?.statusCode)
+        // when
+        val response = restTemplate.getForEntity("/api/coders", Array<Coder>::class.java);
+
+        // then
+        assertEquals(OK, response.statusCode)
+        assertEquals(response.body?.size, 1)
+        assertEquals(response.body?.get(0), coder)
     }
 }
