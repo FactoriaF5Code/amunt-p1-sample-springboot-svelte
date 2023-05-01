@@ -2,11 +2,13 @@ package org.factoriaf5.codersapi
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.factoriaf5.codersapi.controller.CoderNotFoundException
 
 import org.factoriaf5.codersapi.repositories.Coder
 import org.factoriaf5.codersapi.repositories.CoderRepository
 
 import org.hamcrest.Matchers.*
+import org.hibernate.annotations.NotFound
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,8 +19,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.getForObject
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus.OK
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.web.client.HttpClientErrorException
 import java.util.*
 
 @SpringBootTest(
@@ -54,7 +57,7 @@ class BackendApplicationTests {
         val response = restTemplate.getForEntity("/api/coders", Array<Coder>::class.java);
 
         // then
-        assertEquals(OK, response.statusCode)
+        assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(response.body?.size, 1)
         assertEquals(response.body?.get(0), coder)
     }
@@ -67,7 +70,7 @@ class BackendApplicationTests {
         val request = HttpEntity(requestBody, headers)
         val response = restTemplate.postForEntity("/api/coders", request, Coder::class.java)
         val id = response.getBody()!!.id!!
-        assertEquals(OK, response.statusCode)
+        assertEquals(HttpStatus.OK, response.statusCode)
         val coder = repository.findById(id).get()
         assertEquals(coder.name, "Gabi")
         assertEquals(coder.favoriteLanguage, "Kotlin")
@@ -84,13 +87,21 @@ class BackendApplicationTests {
         val response = restTemplate.getForEntity("/api/coders/{id}", Coder::class.java, coderId)
         val responseBody = response.getBody()
 
-        assertEquals(OK, response.statusCode)
+        assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(coder.id, responseBody?.id)
         assertEquals(coder.name, responseBody?.name)
         assertEquals(coder.favoriteLanguage, responseBody?.favoriteLanguage)
         assertEquals(coder.imageUrl, responseBody?.imageUrl)
 
     }
+
+    @Test
+    fun getCoderByIdNotFound(){
+        val id = 999999
+        val response = restTemplate.getForEntity("/api/coders/{id}", CoderNotFoundException::class.java, id)
+        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
+    }
+
 }
 
 
