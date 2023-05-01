@@ -14,6 +14,7 @@ class CoderController(private val coderRepo: CoderRepository) {
     }
 
     @PostMapping("/api/coders")
+    @ResponseStatus(HttpStatus.CREATED)
     fun createNewCoder(@RequestBody coder: Coder): Coder? {
         return coderRepo.save(coder)
     }
@@ -21,6 +22,14 @@ class CoderController(private val coderRepo: CoderRepository) {
     @GetMapping("/api/coders/{id}")
     fun findCoder(@PathVariable id: Long): Coder? {
         return coderRepo.findById(id).orElseThrow { CoderNotFoundException() }
+    }
+
+    @DeleteMapping("/api/coders/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteCoder(@PathVariable id: Long): Coder? {
+        val coder: Coder = coderRepo.findById(id).orElseThrow { CoderNotFoundException() }
+        coderRepo.deleteById(id)
+        return coder
     }
 }
 
