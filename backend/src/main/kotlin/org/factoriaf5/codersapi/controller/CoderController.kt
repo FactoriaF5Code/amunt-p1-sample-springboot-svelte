@@ -2,11 +2,9 @@ package org.factoriaf5.codersapi.controller
 
 import org.factoriaf5.codersapi.repositories.Coder
 import org.factoriaf5.codersapi.repositories.CoderRepository
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
+
 @CrossOrigin
 @RestController
 class CoderController(private val coderRepo: CoderRepository) {
@@ -16,7 +14,15 @@ class CoderController(private val coderRepo: CoderRepository) {
     }
 
     @PostMapping("/api/coders")
-    fun createNewCoder(@RequestBody coder:Coder): Coder?{
+    fun createNewCoder(@RequestBody coder: Coder): Coder? {
         return coderRepo.save(coder)
     }
+
+    @GetMapping("/api/coders/{id}")
+    fun findCoder(@PathVariable id: Long): Coder? {
+        return coderRepo.findById(id).orElseThrow { CoderNotFoundException() }
+    }
 }
+
+@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "coder not found")
+class CoderNotFoundException : RuntimeException()

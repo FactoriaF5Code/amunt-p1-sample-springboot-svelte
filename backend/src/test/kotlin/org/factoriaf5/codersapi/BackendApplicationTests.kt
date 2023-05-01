@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.test.web.client.getForObject
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.OK
@@ -68,9 +69,27 @@ class BackendApplicationTests {
         val id = response.getBody()!!.id!!
         assertEquals(OK, response.statusCode)
         val coder = repository.findById(id).get()
-        assertEquals(coder.name,"Gabi" )
-        assertEquals(coder.favoriteLanguage,"Kotlin" )
-        assertEquals(coder.imageUrl,"example2.jpg" )
+        assertEquals(coder.name, "Gabi")
+        assertEquals(coder.favoriteLanguage, "Kotlin")
+        assertEquals(coder.imageUrl, "example2.jpg")
+    }
+
+    @Test
+    fun getCoderById() {
+
+        val coder = Coder(name = "Gabi", favoriteLanguage = "Kotlin", imageUrl = "example2.jpg")
+        repository.save(coder)
+        val coderId = coder.id
+
+        val response = restTemplate.getForEntity("/api/coders/{id}", Coder::class.java, coderId)
+        val responseBody = response.getBody()
+
+        assertEquals(OK, response.statusCode)
+        assertEquals(coder.id, responseBody?.id)
+        assertEquals(coder.name, responseBody?.name)
+        assertEquals(coder.favoriteLanguage, responseBody?.favoriteLanguage)
+        assertEquals(coder.imageUrl, responseBody?.imageUrl)
+
     }
 }
 
