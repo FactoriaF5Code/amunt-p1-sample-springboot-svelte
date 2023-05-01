@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.test.web.client.exchange
 import org.springframework.boot.test.web.client.getForObject
 import org.springframework.http.*
 import org.springframework.test.util.AssertionErrors.assertFalse
@@ -95,14 +96,14 @@ class BackendApplicationTests {
     }
 
     @Test
-    fun getCoderByIdNotFound(){
+    fun getCoderByIdNotFound() {
         val id = 999999
         val response = restTemplate.getForEntity("/api/coders/{id}", CoderNotFoundException::class.java, id)
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
     }
 
     @Test
-    fun deleteCoder(){
+    fun deleteCoder() {
         val coder = Coder(name = "Gabi", favoriteLanguage = "Kotlin", imageUrl = "example2.jpg")
         repository.save(coder)
         val coderId = coder.id!!
@@ -113,6 +114,28 @@ class BackendApplicationTests {
         val deleteCoder = repository.findById(coderId)
         assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
         assertTrue(deleteCoder.isEmpty())
+    }
+
+    @Test
+    fun updateCoder() {
+        val coder = Coder(name = "Gabi", favoriteLanguage = "Kotlin", imageUrl = "example2.jpg")
+        repository.save(coder)
+        val coderId = coder.id
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        val requestBody = Coder("Xavi", "Python", "example2.jpg")
+        val request = HttpEntity(requestBody, headers)
+
+        val response = restTemplate.exchange("/api/coders/{id}",HttpMethod.PUT, request, Coder::class.java, coderId)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        val freshCoder = repository.findById(coderId!!).get()
+        assertEquals(freshCoder.name, "Xavi")
+        assertEquals(freshCoder.favoriteLanguage, "Python")
+        assertEquals(freshCoder.imageUrl, "example2.jpg")
+
+
     }
 
 }

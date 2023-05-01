@@ -31,6 +31,15 @@ class CoderController(private val coderRepo: CoderRepository) {
         coderRepo.deleteById(id)
         return coder
     }
+
+    @PutMapping("/api/coders/{id}")
+    fun updateCoderById(@RequestBody coderdata: Coder, @PathVariable id: Long): Coder? {
+        val coder: Coder = coderRepo.findById(id).orElseThrow { CoderNotFoundException() }
+        coder.name = coderdata.name
+        coder.favoriteLanguage = coderdata.favoriteLanguage
+        coder.imageUrl = coderdata.imageUrl
+        return coderRepo.save(coder)
+    }
 }
 
 @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "coder not found")
